@@ -6,6 +6,15 @@ class Usuario_model extends CI_Model {
         $query = $this->db->get('usuario');
         return $query->result();
     }
+    public function getOne($id) {
+        if ($id > 0) {
+            $this->db->where('id', $id);
+            $query = $this->db->get('usuario');
+            return $query->row(0);
+        } else {
+            return false;
+        }
+    }
     public function insert($data = array()) {
         $this->db->insert('usuario', $data);
         return $this->db->affected_rows();
@@ -19,7 +28,6 @@ class Usuario_model extends CI_Model {
             return false;
         }
     }
-
     public function update($id, $data = array()) {
         if ($id > 0) {
             $this->db->where('id', $id);

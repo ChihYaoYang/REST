@@ -22,7 +22,8 @@ require APPPATH . '/libraries/REST_Controller.php';
 require APPPATH . '/libraries/REST_Controller_Definitions.php';
 require APPPATH . '/libraries/Format.php';
 
-class V1 extends REST_Controller {
+class V1 extends REST_Controller
+{
 
     public function __construct()
     {
@@ -32,7 +33,8 @@ class V1 extends REST_Controller {
     //o nome dos método sempre vem acompanhado do tipo de requisição
     //ou seja, contato_get significa que é uma requisição do tipo GET
     //e o usuário vai requisitar apenas /contato EX:http://127.0.0.1/wssenac/rest/V1/contato
-    public function contato_get() {
+    public function contato_get()
+    {
         $retorno = [
             'status' => true,
             'nome' => 'ryan',
@@ -43,14 +45,20 @@ class V1 extends REST_Controller {
     }
 
     public function usuario_get() {
+        $id = (int) $this->get('id');
         $this->load->model('Usuario_model', 'us');
-        $data = $this->us->get();
+        if($id <= 0) {
+            $data = $this->us->get();
+        } else {
+            $data = $this->us->getOne($id);
+        }
         $this->set_response($data, REST_Controller_Definitions::HTTP_OK);
     }
     //usuario_post significa que este método vai ser executado
     //quando os WS(web-service) receber uma requisição do tipo 
     //POST na url 'usuario'
-    public function usuario_post() {
+    public function usuario_post()
+    {
         //Primeiro fazemos a validação, para verificar o preenchimento dos campos
         if ((!$this->post('email')) || (!$this->post('senha'))) {
             $this->set_response([
@@ -81,23 +89,37 @@ class V1 extends REST_Controller {
         }
     }
     //deletar
-    public function usuario_delete($id) {
+    public function usuario_delete() {
+        $id = (int) $this->get('id');
+        if ($id <= 0) {
+            $this->set_response([
+                'status' => false,
+                'error' => 'Parâmetros obrigatórios não fornecidos'
+            ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
+            return;
+        }
         $this->load->model('Usuario_model', 'us');
         if ($this->us->delete($id)) {
+            //deu certo 
             $this->set_response([
                 'status' => true,
                 'message' => 'Usuário deletado com successo !'
             ], REST_Controller_Definitions::HTTP_OK);
         } else {
+            //deu errado
             $this->set_response([
                 'status' => false,
                 'error' => 'Falha ao deletar usuário'
             ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
         }
     }
-    //alterar
-    public function usuario_put($id) {
-        if ((!$this->put('email')) || (!$this->put('senha'))) {
+    //usuario_post significa que este método vai ser executado
+    //quando os WS(web-service) receber uma requisição do tipo 
+    //PUT na url 'usuario'
+    public function usuario_put() {
+        $id = (int) $this->get('id');
+        //Primeiro fazemos a validação, para verificar o preenchimento dos campos
+        if ((!$this->put('email')) || (!$this->put('senha') || ($id <= 0))) {
             $this->set_response([
                 'status' => false,
                 'error' => 'Campo não preenchidos'
@@ -108,6 +130,8 @@ class V1 extends REST_Controller {
             'email' => $this->put('email'),
             'senha' => $this->put('senha'),
         );
+        //carregamos o model, e mandamos inserir no DB 
+        //os dados recebidos via PUT
         $this->load->model('Usuario_model', 'us');
         if ($this->us->update($id, $data)) {
             //deu certo 

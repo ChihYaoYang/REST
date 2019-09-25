@@ -11,11 +11,16 @@ class Integrante extends REST_Controller {
         parent::__construct();
         $this->load->model('Integrante_model','it');
     }
-    public function integrante_get() {
-        $data = $this->it->get();
-        $this->set_response($data,REST_Controller_Definitions::HTTP_OK);
+    public function index_get() {
+        $id = (int) $this->get('id');
+        if ($id <= 0) {
+            $data = $this->it->get();
+        } else {
+            $data = $this->it->getOne($id);
+        }
+        $this->set_response($data, REST_Controller_Definitions::HTTP_OK);
     }
-    public function integrante_post() {
+    public function index_post() {
         if ((!$this->post('id_equipe')) || (!$this->post('nome')) || (!$this->post('data_nasc')) || (!$this->post('rg')) || (!$this->post('cpf'))) {
             $this->set_response([
                 'status' => false,
@@ -42,8 +47,15 @@ class Integrante extends REST_Controller {
             ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
         }
     }
-    public function integrante_delete($id) {
-        if($id > 0) {
+    public function index_delete() {
+        $id = (int) $this->get('id');
+        if ($id <= 0) {
+            $this->set_response([
+                'status' => false,
+                'error' => 'Parâmetros obrigatórios não fornecidos'
+            ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
+            return;
+        }
             if($this->it->delete($id)) {
                 $this->set_response([
                     'status' => true,
@@ -55,15 +67,11 @@ class Integrante extends REST_Controller {
                     'error' => 'Falha ao deletar integrante'
                 ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
             }
-        } else {
-            $this->set_response([
-                'status' => false,
-                'error' => 'Falha ao deletar integrante'
-            ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
-        }
+       
     }
-    public function integrante_put($id) {
-        if ( (!$this->put('id_equipe')) || (!$this->put('nome')) || (!$this->put('data_nasc')) || (!$this->put('rg')) || (!$this->put('cpf'))) {
+    public function index_put() {
+        $id = (int) $this->get('id');
+        if ( (!$this->put('id_equipe')) || (!$this->put('nome')) || (!$this->put('data_nasc')) || (!$this->put('rg')) || (!$this->put('cpf')) || ($id <= 0)) {
             $this->set_response([
                 'status' => false,
                 'error' => 'Campo não preenchidos'
@@ -88,7 +96,6 @@ class Integrante extends REST_Controller {
                 'error' => 'Falha ao alterar integrante'
             ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
         }
+      
     }
 }
-
-?>

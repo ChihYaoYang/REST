@@ -52,3 +52,10 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $route['default_controller'] = 'welcome';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
+
+$route['rest/V1/usuario/(:num)'] = 'rest/V1/usuario/id/$1';
+$route['rest/Equipe/index/(:num)'] = 'rest/Equipe/index/id/$1';
+$route['rest/Integrante/index/(:num)'] = 'rest/Integrante/index/id/$1';
+$route['rest/Pontuacao/index/(:num)'] = 'rest/Pontuacao/index/id/$1';
+$route['rest/Prova/index/(:num)'] = 'rest/Prova/index/id/$1';
+$route['rest/Usuario/index/(:num)'] = 'rest/Usuario/index/id/$1';

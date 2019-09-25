@@ -1,21 +1,32 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
 use Restserver\Libraries\REST_Controller;
 use Restserver\Libraries\REST_Controller_Definitions;
+
 require APPPATH . '/libraries/REST_Controller.php';
 require APPPATH . '/libraries/REST_Controller_Definitions.php';
 require APPPATH . '/libraries/Format.php';
 
-class Prova extends REST_Controller {
-    public function __construct() {
+class Prova extends REST_Controller
+{
+    public function __construct()
+    {
         parent::__construct();
-        $this->load->model('Prova_model','pr');
+        $this->load->model('Prova_model', 'pr');
     }
-    public function prova_get() {
-        $data = $this->pr->get();
-        $this->set_response($data,REST_Controller_Definitions::HTTP_OK);
+    public function index_get()
+    {
+        $id = (int) $this->get('id');
+        if ($id <= 0) {
+            $data = $this->pr->get();
+        } else {
+            $data = $this->pr->getOne($id);
+        }
+        $this->set_response($data, REST_Controller_Definitions::HTTP_OK);
     }
-    public function prova_post() {
+    public function index_post()
+    {
         if ((!$this->post('nome')) || (!$this->post('descricao')) || (!$this->post('num_int'))) {
             $this->set_response([
                 'status' => false,
@@ -28,7 +39,7 @@ class Prova extends REST_Controller {
             'descricao' => $this->post('descricao'),
             'num_int' => $this->post('num_int')
         );
-        if($this->pr->insert($data)) {
+        if ($this->pr->insert($data)) {
             $this->set_response([
                 'status' => true,
                 'message' => 'prova inserido com successo !'
@@ -40,19 +51,21 @@ class Prova extends REST_Controller {
             ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
         }
     }
-    public function prova_delete($id) {
-        if($id > 0) {
-            if($this->pr->delete($id)) {
-                $this->set_response([
-                    'status' => true,
-                    'message' => 'prova deletado com successo !'
-                ], REST_Controller_Definitions::HTTP_OK);
-            } else {
-                $this->set_response([
-                    'status' => false,
-                    'error' => 'Falha ao deletar prova'
-                ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
-            }
+    public function index_delete()
+    {
+        $id = (int) $this->get('id');
+        if ($id <= 0) {
+            $this->set_response([
+                'status' => false,
+                'error' => 'Parâmetros obrigatórios não fornecidos'
+            ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
+            return;
+        }
+        if ($this->pr->delete($id)) {
+            $this->set_response([
+                'status' => true,
+                'message' => 'prova deletado com successo !'
+            ], REST_Controller_Definitions::HTTP_OK);
         } else {
             $this->set_response([
                 'status' => false,
@@ -60,8 +73,10 @@ class Prova extends REST_Controller {
             ], REST_Controller_Definitions::HTTP_BAD_REQUEST);
         }
     }
-    public function prova_put($id) {
-        if ((!$this->put('nome')) || (!$this->put('descricao')) || (!$this->put('num_int'))) {
+    public function index_put()
+    {
+        $id = (int) $this->get('id');
+        if ((!$this->put('nome')) || (!$this->put('descricao')) || (!$this->put('num_int')) || ($id <= 0)) {
             $this->set_response([
                 'status' => false,
                 'error' => 'Campo não preenchidos'
@@ -86,5 +101,3 @@ class Prova extends REST_Controller {
         }
     }
 }
-
-?>

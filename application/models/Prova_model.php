@@ -7,6 +7,15 @@ class Prova_model extends CI_Model {
         $query = $this->db->get(self::table);
         return $query->result();
     }
+    public function getOne($id) {
+        if ($id > 0) {
+            $this->db->where('id', $id);
+            $query = $this->db->get(self::table);
+            return $query->row(0);
+        } else {
+            return false;
+        }
+    }
     public function insert($data = array()) {
         $this->db->insert(self::table, $data);
         return $this->db->affected_rows();
